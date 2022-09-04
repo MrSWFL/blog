@@ -1,0 +1,32 @@
+{
+    ///home/mayer/Study/DfB4_v2/message-board/.vscode/launch.json
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "name": "Python: Django",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/manage.py",
+            "args": [
+                "runserver",
+                "0:8000"
+            ],
+            "django": true,
+            "justMyCode": true
+        },
+
+        {
+            "name": "Python: Dj Test",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/manage.py",
+            "args": [
+                "test",
+            ],
+            "django": true,
+            "justMyCode": true
+        }
+
+    ]
+}
