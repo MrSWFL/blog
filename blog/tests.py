@@ -82,6 +82,7 @@ class BlogTests(TestCase):
         self.assertEqual(r.status_code, SUCCESS)
 
 
+    # [U,T] Test"path name"; Template contents; Template filename
     def test_post_listview(self):
         r = self.client.get(reverse(u_home_name))
 
@@ -89,7 +90,7 @@ class BlogTests(TestCase):
         self.assertContains(r, t_home_content)
         self.assertTemplateUsed(r, t_home_filename)
 
-
+    # [U,T] Test"path name"; Template contents; Template filename
     def test_post_detailview(self):
         r = self.client.get(reverse(u_post_name, kwargs={"pk" : self.post.pk}))
         bad_r = self.client.get(u_bad_post_detail_url)
