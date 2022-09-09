@@ -6,8 +6,10 @@ from django.urls import reverse
 from .models import Post
 
 # -CONSTANTS -----
-SUCCESS = 200
-FAILURE = 404
+# -- HTTP status codes   See: developer.mozilla.org/en-US/docs/Web/HTTP/Status
+SUCCESS = 200       # 200: OK
+REDIRECT = 302     # 302: REDIRECT
+FAILURE = 404       # 404: Page Not Found
 
 # -- User details
 u_username = "testuser"
@@ -18,6 +20,8 @@ u_password = "secret"
 p_title = "Little Miss Muffet..."
 p_body = "Sweet, warm, curvy"
 p_author = "The big bad wolf"
+p_upd_title = "The meaning of Life"
+p_upd_body = "Endless BS about contemplating my navel."
 
 # -- URL details
 u_post_list_url = "/"
@@ -25,15 +29,15 @@ u_post_detail_url = "/post/1/"
 u_bad_post_detail_url = "/post/99999/"
 
 # -- URL/Template details
-t_base_content = "<!-- templates/base.html v1.0 -->"
+t_base_content = "<!-- templates/base.html -->"
 
 u_home_name = "home"
 t_home_filename = "home.html"
-t_home_content = "<!-- templates/home.html 1.0 -->"
+t_home_content = "<!-- templates/home.html -->"
 
 u_post_name = "post_detail"
 t_post_filename = "post_detail.html"
-t_post_content = "<!-- templates/post_detail.html v1.0 -->"
+t_post_content = "<!-- templates/post_detail.html -->"
 
 class BlogTests(TestCase):
     # -- SETUP -----
@@ -90,12 +94,49 @@ class BlogTests(TestCase):
         self.assertContains(r, t_home_content)
         self.assertTemplateUsed(r, t_home_filename)
 
-    # [U,T] Test"path name"; Template contents; Template filename
+    # [U,T] Test"path name" URL; Template contents; Template filename
     def test_post_detailview(self):
         r = self.client.get(reverse(u_post_name, kwargs={"pk" : self.post.pk}))
-        bad_r = self.client.get(u_bad_post_detail_url)
+        bad_r = self.client.get(u_bad_post_detail_url)  # Do a "negative" test
 
         self.assertEqual(r.status_code, SUCCESS)
         self.assertEqual(bad_r.status_code, FAILURE)
         self.assertContains(r, t_post_content)
         self.assertTemplateUsed(r, t_post_filename)
+
+    # [V, U, T] Test BlogCreateView
+    def test_post_createview(self):
+        r = self.client.post(
+            reverse("post_new"),
+            {
+                "title" : p_title,
+                "body" : p_body,
+                "author" : self.user.id,
+            },
+        )
+
+        self.assertEqual(r.status_code, REDIRECT)
+        self.assertEqual(Post.objects.last().title, p_title)
+        self.assertEqual(Post.objects.last().body, p_body)
+
+    # [V, U, T] Test BlogUpdateView
+    def test_post_updateview(self):
+        r = self.client.post(
+            reverse("post_edit", args="1"),
+            {
+                "title" : p_upd_title,
+                "body" : p_upd_body,
+            },
+        )
+
+        self.assertEqual(r.status_code, REDIRECT)
+        self.assertEqual(Post.objects.last().title, p_upd_title)
+        self.assertEqual(Post.objects.last().body, p_upd_body)
+
+
+    # [V, U, T] Test BlogDeleteView
+    def test_post_deleteview(self):
+        r = self.client.post(reverse("post_delete", args="1"))
+
+        self.assertEqual(r.status_code, REDIRECT)
+    
