@@ -1,4 +1,4 @@
-<!-- templates/base.html v1.1 -->
+<!-- templates/base.html -->
 {% load static %}
 <html>
 
@@ -11,12 +11,23 @@
 <body>
   <header>
     <div class="nav-left">
-      <h1><a href="{% url 'home' %}">Django blog</a></h1>
+      <h1><a href="{% url 'home' %}">Django blog</a></h1> 
     </div>
     
     <div class="nav-right">
       <a href="{% url 'post_new' %}">+New Blog Post</a>
+      &nbsp;&nbsp;&nbsp;
     </div>
+
+    <div class="nav-right">
+      {% if user.is_authenticated %}
+        Hi! {{ user.username }}&nbsp;&nbsp; <a href="{% url 'logout' %}">Logout</a>
+      {% else %}
+        <a href="{% url 'login' %}">Login</a>&nbsp;&nbsp;
+        <a href="{% url 'signup' %}">Signup</a>
+      {% endif %} 
+    </div>
+
   </header>
 
   <div>
